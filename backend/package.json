@@ -1,0 +1,39 @@
+{
+  "name": "internship-management-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "migrate": "prisma migrate dev",
+    "seed": "prisma db seed",
+    "reset": "prisma migrate reset --force"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1067.0",
+    "@aws-sdk/lib-storage": "^3.1067.0",
+    "@prisma/client": "^6.19.3",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.7",
+    "express": "^5.2.1",
+    "express-rate-limit": "^7.5.1",
+    "ioredis": "^5.11.1",
+    "jsonwebtoken": "^9.0.3",
+    "mammoth": "^1.12.0",
+    "multer": "^2.1.1",
+    "multer-s3": "^3.0.1",
+    "nodemailer": "^8.0.11",
+    "pdf-parse": "^2.4.5",
+    "rate-limit-redis": "^4.3.1",
+    "winston": "^3.19.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.3"
+  }
+}
