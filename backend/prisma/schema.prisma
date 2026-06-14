@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int              @id @default(autoincrement())
+  email         String           @unique
+  passwordHash  String           @map("password_hash")
+  role          String           @default("student")
+  name          String
+  companyName   String?          @map("company_name")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+
+  internships   Internship[]
+  applications  Application[]   @relation("StudentApplications")
+  ratingsGiven  CompanyRating[] @relation("CompanyRatingStudent")
+  ratings       CompanyRating[] @relation("CompanyRatingCompany")
+
+  @@map("users")
+}
+
+model Internship {
+  id            Int             @id @default(autoincrement())
+  companyId     Int             @map("company_id")
+  title         String
+  description   String
+  requirements  String?
+  location      String?
+  isActive      Boolean         @default(true) @map("is_active")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  company       User            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  applications  Application[]
+
+  @@map("internships")
+}
+
+model Application {
+  id            Int             @id @default(autoincrement())
+  internshipId  Int             @map("internship_id")
+  studentId     Int             @map("student_id")
+  status        String          @default("pending")
+  coverLetter   String?         @map("cover_letter")
+  cvS3Key       String?         @map("cv_s3_key")
+  extractedText String?         @map("extracted_text")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  internship    Internship      @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+  student       User            @relation("StudentApplications", fields: [studentId], references: [id], onDelete: Cascade)
+  interview     Interview?
+
+  @@map("applications")
+}
+
+model Interview {
+  id              Int           @id @default(autoincrement())
+  applicationId   Int           @unique @map("application_id")
+  scheduledAt     DateTime      @map("scheduled_at")
+  durationMinutes Int           @default(60) @map("duration_minutes")
+  meetingLink     String?       @map("meeting_link")
+  status          String        @default("scheduled")
+  notes           String?
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  application     Application   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("interviews")
+}
+
+model CompanyRating {
+  id          Int       @id @default(autoincrement())
+  companyId   Int       @map("company_id")
+  studentId   Int       @map("student_id")
+  rating      Int
+  review      String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  company     User      @relation("CompanyRatingCompany", fields: [companyId], references: [id], onDelete: Cascade)
+  student     User      @relation("CompanyRatingStudent", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, studentId])
+  @@map("company_ratings")
+}
